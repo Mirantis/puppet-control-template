@@ -1,0 +1,4 @@
+---
+master:
+  facts:
+    cache: yaml

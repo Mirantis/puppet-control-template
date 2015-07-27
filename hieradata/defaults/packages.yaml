@@ -1,0 +1,89 @@
+---
+########################
+### Default Packages ###
+########################
+
+# Test build
+# CentOS 7 packages
+CentOS::7::packages:
+  - vim-enhanced
+  - net-tools
+  - telnet
+  - wget
+  - bind-utils
+  - nmap-ncat
+  - lsscsi
+  - smartmontools
+  - bc
+  - perl
+  - perl-Net-SSLeay
+  - perl-Getopt-Long
+  - iptraf-ng
+  - tcpdump
+  - strace
+  - screen
+  - rsync
+  - mlocate
+  - mcelog
+
+# CentOS 6 Packages
+CentOS::6::packages:
+  - vim-enhanced
+  - telnet
+  - wget
+  - bind-utils
+  - nc
+  - lsscsi
+  - smartmontools
+  - bc
+  - perl
+  - perl-Net-SSLeay
+  - iptraf
+  - tcpdump
+  - strace
+  - screen
+  - rsync
+  - mlocate
+  - mcelog
+
+# Ubuntu 12.04 packages
+Ubuntu::12.04::packages:
+  - vim
+  - telnet
+  - mtr-tiny
+  - bc
+  - strace
+  - screen
+  - sysstat
+  - mlocate
+  - rsync
+  - mcelog
+
+# Ubuntu 14.04 packages
+Ubuntu::14.04::packages:
+  - vim
+  - telnet
+  - mtr-tiny
+  - bc
+  - strace
+  - screen
+  - sysstat
+  - mlocate
+  - rsync
+  - mcelog
+
+Ubuntu::14::packages:
+  - vim
+  - telnet
+  - mtr-tiny
+  - bc
+  - strace
+  - screen
+  - sysstat
+  - mlocate
+  - rsync
+  - mcelog
+
+####################
+### End Packages ###
+####################

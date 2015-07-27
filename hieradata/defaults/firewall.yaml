@@ -1,0 +1,15 @@
+---
+#########################
+#### Firewall Rules #####
+#########################
+
+firewall::rules:
+  ssh_source_cidr: '0.0.0.0/0'
+  puppet_source_cidr: '0.0.0.0/0'
+  ssl_source_cidr: '0.0.0.0/0'
+  proxy_source_cidr: '0.0.0.0/0'
+  icmp_source_cidr: '0.0.0.0/0'
+
+#########################
+### End Firewall Rules ##
+#########################

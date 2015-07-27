@@ -1,0 +1,152 @@
+---
+# Encrypt any secrets in here with hiera-eyaml
+message: "This node is using foreman application tier data"
+
+####################
+###   Foreman   ####
+####################
+
+foreman::config:
+  unattended:             true
+  passenger:              true
+  use_vhost:              true
+  servername:             "%{::fqdn}"
+  version:                "present"
+  db_manage:              true
+  db_database:            "foreman"
+  db_username:            "foreman"
+  db_password:            'your db password for foreman'
+  puppet_home:            "/var/lib/puppet"
+  locations_enabled:      false
+  organizations_enabled:  false
+  admin_username:         "admin"
+  admin_password:         'your admin password for foreman'
+  admin_email:            "you@yourdomain.tld"
+  initial_organization:   "YourOrg"
+  initial_location:       "YourDatacenter"
+  server_ssl_ca:          "/var/lib/puppet/ssl/certs/ca.pem"
+  server_ssl_cert:        "/var/lib/puppet/ssl/certs/%{::fqdn}.pem"
+  server_ssl_key:         "/var/lib/puppet/ssl/private_keys/%{::fqdn}.pem"
+  server_ssl_crl:         "/var/lib/puppet/ssl/crl.pem"
+  apipie_task:            "apipie:cache:index"
+  oauth_key:              'your oauth key for foreman'
+  oauth_secret:           'your oauth secret for foreman'
+
+####################
+### End Foreman ####
+####################
+
+#####################
+### Foreman Proxy ###
+#####################
+
+foreman::proxy::config:
+  repo: "stable"
+  gpgcheck: true
+  version: "present"
+  ssl: true
+  user: "foreman-proxy"
+  log_level: "DEBUG"
+  ssl_ca: "/var/lib/puppet/ssl/certs/ca.pem"
+  ssl_cert: "/var/lib/puppet/ssl/certs/%{fqdn}.pem"
+  ssl_key: "/var/lib/puppet/ssl/private_keys/%{fqdn}.pem"
+  trusted_hosts:
+    - puppet.yourdomain.tld
+    - foreman.yourdomain.tld
+    - 127.0.0.1
+  manage_sudoersd: false
+  use_sudoersd: false
+  puppetca: true
+  puppetca_listen_on: "https"
+  ssldir: "/var/lib/puppet/ssl"
+  puppetdir: "/etc/puppet"
+  autosign_location: "/var/lib/puppet/autosign.conf"
+  puppet_group: "puppet"
+  puppetrun: true
+  puppetssh_keyfile: "/etc/foreman-proxy/keys/foreman-proxy_rsa"
+  puppetssh_sudo: false
+  puppetssh_command: "/usr/bin/puppet agent --onetime --no-usecacheonfailure"
+  puppetssh_user: "root"
+  puppetrun_listen_on: "https"
+  puppetrun_provider: "puppetssh"
+  puppet_user: "root"
+  puppet_url: "https://%{::fqdn}:8140"
+  puppet_ssl_ca: "/var/lib/puppet/ssl/certs/ca.pem"
+  puppet_ssl_cert: "/var/lib/puppet/ssl/certs/%{fqdn}.pem"
+  puppet_ssl_key: "/var/lib/puppet/ssl/private_keys/%{fqdn}.pem"
+  templates: false
+  tftp: false
+  dhcp: false
+  dns: false
+  bmc: false
+  puppet: true
+  registered_name: "%{::fqdn}"
+  registred_url: "https://%{::fqdn}:8443"
+  foreman_base_url: "https://foreman.yourdomain.tld"
+  oauth_effective_user: "admin"
+  oauth_consumer_key: 'oauth key for foreman'
+  oauth_consumer_secret: 'oauth secret for foreman'
+  ssh_private_key: |
+    'your ssh private key for foreman-proxy user here. This is for puppetrun functionality'
+  ssh_public_key: |
+    'your ssh public key for foreman-proxy user here.'
+
+#########################
+### End Foreman Proxy ###
+#########################
+
+#########################
+#### Firewall Rules #####
+#########################
+
+firewall::rules:
+  ssh_source_cidr: '0.0.0.0/0'
+  puppet_source_cidr: '0.0.0.0/0'
+  ssl_source_cidr: '0.0.0.0/0'
+  proxy_source_cidr: '0.0.0.0/0'
+
+#########################
+### End Firewall Rules ##
+#########################
+
+#########################
+### User Overrides ######
+#########################
+
+users:
+  foreman-proxy:
+    ensure: present
+    home: /usr/share/foreman-proxy
+    groups:
+      - puppet
+    managehome: false
+
+#########################
+### End User Overrides ##
+#########################
+
+#########################
+### Yum Repo Stuff ######
+#########################
+
+yum::repos:
+  foreman:
+    description: 'Foreman 1.8'
+    baseurl: 'http://yum.theforeman.org/releases/1.8/el7/$basearch'
+    gpgcheck: true
+    gpgkey: 'http://yum.theforeman.org/RPM-GPG-KEY-foreman'
+  foreman_plugins:
+    description: 'Foreman Plugins 1.8'
+    baseurl: 'http://yum.theforeman.org/plugins/1.8/el7/$basearch'
+    gpgcheck: true
+    gpgkey: 'http://yum.theforeman.org/RPM-GPG-KEY-foreman'
+  foreman_proxy:
+    description: 'Foreman stable repository'
+    baseurl: 'http://yum.theforeman.org/releases/latest/el$releasever/$basearch'
+    gpgcheck: true
+    gpgkey: 'http://yum.theforeman.org/RPM-GPG-KEY-foreman'
+  foreman_proxy-plugins:
+    description: 'Foreman stable plugins repository'
+    baseurl: 'http://yum.theforeman.org/plugins/latest/el7/$basearch'
+    gpgcheck: false
+    gpgkey: 'http://yum.theforeman.org/RPM-GPG-KEY-foreman'

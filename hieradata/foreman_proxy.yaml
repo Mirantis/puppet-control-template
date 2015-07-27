@@ -1,0 +1,73 @@
+#####################
+### Foreman Proxy ###
+#####################
+
+foreman::proxy::config:
+  repo: "stable"
+  gpgcheck: true
+  version: "present"
+  ssl: true
+  user: "foreman-proxy"
+  log_level: "DEBUG"
+  ssl_ca: "/var/lib/puppet/ssl/certs/ca.pem"
+  ssl_cert: "/var/lib/puppet/ssl/certs/%{fqdn}.pem"
+  ssl_key: "/var/lib/puppet/ssl/private_keys/%{fqdn}.pem"
+  trusted_hosts:
+    - puppet.yourdomain.tld
+    - foreman.yourdomain.tld
+    - 127.0.0.1
+  manage_sudoersd: false
+  use_sudoersd: false
+  puppetca: true
+  puppetca_listen_on: "https"
+  ssldir: "/var/lib/puppet/ssl"
+  puppetdir: "/etc/puppet"
+  autosign_location: "/var/lib/puppet/autosign.conf"
+  puppet_group: "puppet"
+  puppetrun: true
+  puppetssh_keyfile: "/etc/foreman-proxy/keys/foreman-proxy_rsa"
+  puppetssh_sudo: false
+  puppetssh_command: "/usr/bin/puppet agent --onetime --no-usecacheonfailure"
+  puppetssh_user: "root"
+  puppetrun_listen_on: "https"
+  puppetrun_provider: "puppetssh"
+  puppet_user: "root"
+  puppet_url: "https://%{::fqdn}:8140"
+  puppet_ssl_ca: "/var/lib/puppet/ssl/certs/ca.pem"
+  puppet_ssl_cert: "/var/lib/puppet/ssl/certs/%{fqdn}.pem"
+  puppet_ssl_key: "/var/lib/puppet/ssl/private_keys/%{fqdn}.pem"
+  templates: false
+  tftp: false
+  dhcp: false
+  dns: false
+  bmc: false
+  puppet: true
+  registered_name: "%{::fqdn}"
+  registred_url: "https://%{::fqdn}:8443"
+  foreman_base_url: "https://foreman.yourdomain.tld"
+  oauth_effective_user: "admin"
+  oauth_consumer_key: 'oauth key for foreman here'
+  oauth_consumer_secret: 'oauth secret for foreman here'
+  ssh_private_key: |
+    'ssh private key for foreman-proxy user here. this is for puppetrun'
+  ssh_public_key: |
+    'ssh public key for foreman-proxy user here.'
+
+#########################
+### End Foreman Proxy ###
+#########################
+
+#########################
+##### Sudo Configs ######
+#########################
+sudo::configs:
+  'foreman-proxy':
+    'content': |
+      Defaults:foreman-proxy !requiretty
+      foreman-proxy ALL = NOPASSWD: /usr/bin/puppet cert *
+      foreman-proxy ALL = NOPASSWD: /usr/sbin/puppetrun
+      foreman-proxy ALL = NOPASSWD: /usr/bin/mco puppet runonce *
+    'priority' : 15
+#########################
+### End Sudo Configs ####
+#########################

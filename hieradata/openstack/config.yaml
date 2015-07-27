@@ -1,0 +1,76 @@
+---
+
+# Nova settings
+nova::config:
+  debug: False
+  cpu_allocation_ratio: '8.0'
+  disk_allocation_ratio: '1.0'
+  ram_allocation_ratio: '1.0'
+
+# Cinder settings
+cinder::config:
+  debug: False
+  use_ceph: true
+
+# Keystone settings
+keystone::config:
+  debug: false
+  notification_driver: 'messaging'
+  notification_topics: 'notifications'
+  public_workers: 20
+  admin_workers: 20
+  memcache_dead_retry: 100
+  memcache_socket_timeout: 1
+  dead_retry: 100
+  socket_timeout: 1
+  use_ad: false
+  suffix: 'dc=com'
+  query_scope: 'sub'
+  user_tree_dn: 'dc=com'
+  user_objectclass: 'person'
+  user_id_attribute: 'samaccountname'
+  user_name_attribute: 'samaccountname'
+  user_mail_attribute: 'samaccountname'
+  user_enabled_attribute: 'samaccountname'
+
+# Neutron settings
+neutron::config:
+  debug: false
+  use_aci: false
+  allow_overlapping_ips: false
+  api_workers: 1
+  rpc_workers: 1
+  enable_isolated_metadata: false
+
+# Global settings
+openstack::config:
+  management_vip: '192.168.0.2'
+
+# Sudoers
+sudo::configs:
+  'cloud-init-users':
+    'content' : "root ALL=(ALL) NOPASSWD:ALL"
+    'priority' : 90
+  'cinder_sudoers':
+    'content' : |
+      Defaults:cinder !requiretty
+      cinder ALL = (root) NOPASSWD: /usr/bin/cinder-rootwrap  /etc/cinder/rootwrap.conf *
+    'priority' : 15
+  'neutron_sudoers':
+    'content' : |
+      Defaults:neutron !requiretty
+      neutron ALL = (root) NOPASSWD: /usr/bin/neutron-rootwrap /etc/neutron/rootwrap.conf *
+    'priority' : 20
+  'nova_sudoers':
+    'content' : |
+      Defaults:nova !requiretty
+      nova ALL = (root) NOPASSWD: /usr/bin/nova-rootwrap /etc/nova/rootwrap.conf *
+    'priority' : 25
+  'zabbix':
+    'content' : |
+      Defaults:zabbix !requiretty
+      zabbix ALL = NOPASSWD: /usr/bin/socat /var/lib/haproxy/stats stdio
+      zabbix ALL = NOPASSWD: /usr/sbin/iptstate
+      zabbix ALL = NOPASSWD: /usr/sbin/crm_resource --locate --quiet --resource *
+      zabbix ALL = NOPASSWD: /usr/bin/ceph
+    'priority' : 30

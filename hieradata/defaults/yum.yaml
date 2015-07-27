@@ -1,0 +1,44 @@
+---
+#########################
+### Yum Configuration ###
+#########################
+
+yum::repos:
+  base:
+    description: 'CentOS Base'
+    mirrorlist: 'http://mirrorlist.centos.org/?release=$releasever&arch=$basearch&repo=os&infra=$infra'
+    gpgcheck: true
+    gpgkey: 'http://mirror.centos.org/centos/RPM-GPG-KEY-CentOS-$releasever'
+  extras:
+    description: 'CentOS-$releasever - Extras'
+    mirrorlist: 'http://mirrorlist.centos.org/?release=$releasever&arch=$basearch&repo=extras&infra=$infra'
+    gpgcheck: true
+    gpgkey: 'http://mirror.centos.org/centos/RPM-GPG-KEY-CentOS-$releasever'
+  updates:
+    description: 'CentOS-$releasever - Updates'
+    mirrorlist: 'http://mirrorlist.centos.org/?release=$releasever&arch=$basearch&repo=updates&infra=$infra'
+    gpgcheck: true
+    gpgkey: 'http://mirror.centos.org/centos/RPM-GPG-KEY-CentOS-$releasever'
+  epel:
+    description: 'Extra Packages for Enterprise Linux'
+    mirrorlist: 'https://mirrors.fedoraproject.org/metalink?repo=epel-7&arch=$basearch'
+    gpgcheck: true
+    gpgkey: 'https://dl.fedoraproject.org/pub/epel/RPM-GPG-KEY-EPEL-$releasever'
+  puppetlabs-products:
+    description: 'Puppetlabs Products EL $releasever - $basearch'
+    baseurl: 'http://yum.puppetlabs.com/el/$releasever/products/$basearch'
+    gpgcheck: true
+    gpgkey: 'http://yum.puppetlabs.com/RPM-GPG-KEY-puppetlabs'
+  puppetlabs-deps:
+    description: 'Puppetlabs Dependencies EL $releasever - $basearch'
+    baseurl: 'http://yum.puppetlabs.com/el/7/dependencies/$basearch'
+    gpgcheck: true
+    gpgkey: 'http://yum.puppetlabs.com/RPM-GPG-KEY-puppetlabs'
+  datadog:
+    description: 'Datadog EL $releasever'
+    baseurl: 'http://yum.datadoghq.com/rpm/x86_64/'
+    gpgcheck: false
+
+##########################
+### End Yum Config #######
+##########################

@@ -1,0 +1,19 @@
+---
+##################
+###### ntp #######
+##################
+
+ntp::config:
+  servers:
+    - "0.us.pool.ntp.org"
+    - "1.us.pool.ntp.org"
+    - "2.us.pool.ntp.org"
+    - "3.us.pool.ntp.org"
+  restrict:
+    - "127.0.0.1"
+  config: '/etc/ntp.conf'
+  minpoll: 3
+
+##################
+### End ntp ######
+##################

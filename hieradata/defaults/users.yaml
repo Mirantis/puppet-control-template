@@ -1,0 +1,79 @@
+---
+message: "This node is using user data"
+
+##################
+### User stuff ###
+##################
+
+shells:
+  - bash
+
+users::root:
+  root:
+    ensure: present
+    home: /root
+    shell: /bin/bash
+    uid: 0
+    # generate with `openssl passwd 1`
+    password: '$1$EDLqltWJ$S9FOaTsnZizD4Vh5Uhc9L1'
+    managehome: false
+
+users:
+  youruser:
+    ensure: present
+    home: /home/admin
+    shell: /bin/bash
+    uid: 505
+    groups:
+      - wheel
+    password: '$1$EDLqltWJ$S9FOaTsnZizD4Vh5Uhc9L1'
+    managehome: true
+  foreman-proxy:
+    ensure: present
+    home: /home/foreman-proxy
+    groups:
+      - puppet
+    managehome: true
+
+groups:
+  wheel:
+    ensure: present
+  admins:
+    ensure: present
+
+ssh_keys:
+  youruser:
+    ensure: present
+    key: 'ssh public key for user youruser here'
+    type: ssh-rsa
+    user: youruser
+  foreman-proxy:
+    ensure: present
+    key: AAAAB3NzaC1yc2EAAAADAQABAAABAQCuUiO8Lu7S9IfTCKndz590uGTdILzY164bCuwl55SC93wlMb4iXBQu/kSweF3B/rqzp7nAC1vZjBNDu17eHMLYpF20ErVIdvLjfG6B0bdpmZ1JitEZW9bBIPpm2XX4B3WF4leZA8uqOpODyBMob4CuXSLI14pZ+1p2DE8h2NDBxsu9DvQ3qXir2Ze26CchDRFmdVCH3pOb9/5EE9CPByNbtAtvCxPyhytlCA+BLfAHEbmLC5rX/qeMtlLYqJGwscrldvKlBxf3nI1vrvi0D8zulZnEq5kagXwL3sAbQZj6FJRzRfTlF3XggFxBAuuMXy2iigqkMTbMEPagUxpAU2WV
+    type: ssh-rsa
+    user: foreman-proxy
+
+######################
+### End user stuff ###
+######################
+
+###############
+#### Sudo #####
+###############
+
+sudo::configs:
+  'wheel':
+    'content'  : "%wheel    ALL=(ALL)    ALL"
+    'priority' : 10
+  'foreman-proxy':
+    'content': |
+      Defaults:foreman-proxy !requiretty
+      foreman-proxy ALL = NOPASSWD: /usr/bin/puppet cert *
+      foreman-proxy ALL = NOPASSWD: /usr/sbin/puppetrun
+      foreman-proxy ALL = NOPASSWD: /usr/bin/mco puppet runonce *
+      foreman-proxy ALL = NOPASSWD: /usr/bin/puppet agent *
+    'priority' : 15
+
+###############
+## End Sudo ###
+###############

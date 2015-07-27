@@ -1,0 +1,25 @@
+---
+message: "This node is using deploy application_tier data"
+
+users:
+  deploy:
+    ensure: present
+    home: /home/deploy
+    shell: /bin/bash
+    # Generate below with `openssl passwd -1`
+    password: '$1$EDLqltWJ$S9FOaTsnZizD4Vh5Uhc9L1'
+    managehome: true
+
+deploy::config:
+  group: nobody
+  mode: '0755'
+  puppetmasters:
+    - 'puppet.yourdomain.tld'
+    - 'foreman.yourdomain.tld'
+  ssh_private_key: 'your private key for deploy app to use here'
+  foreman_user: 'deploy'
+  foreman_pass: 'password of deploy user in foreman. This is used for updating environments/puppet classes when things change'
+  foreman_server: 'foreman.yourdomain.tld'
+  proxy_id: '1'
+  deploy_user: 'deploy'
+  deploy_pass: 'password for the deploy app to use here. This is for basic http auth.'

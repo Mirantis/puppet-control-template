@@ -1,0 +1,12 @@
+---
+##################
+### SSH Config ###
+##################
+
+ssh::config:
+  permit_root_login: 'no'
+  permit_passwd_auth: 'no'
+
+##################
+#### End SSH #####
+##################

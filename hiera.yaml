@@ -1,0 +1,27 @@
+# managed by puppet
+---
+:backends:
+  - eyaml
+:logger: console
+:hierarchy:
+  - "%{clientcert}"
+  - "%{application_tier}"
+  - "%{application_tier}/auth"
+  - "%{application_tier}/rabbit"
+  - "%{application_tier}/config"
+  - "defaults/datadog"
+  - "defaults/firewall"
+  - "defaults/ntp"
+  - "defaults/packages"
+  - "defaults/puppet"
+  - "defaults/ssh"
+  - "defaults/users"
+  - "defaults/yum"
+
+:eyaml:
+   :datadir: /etc/puppet/environments/%{environment}/hieradata
+   :extension: yaml
+   :pkcs7_private_key: /etc/puppet/keys/private_key.pkcs7.pem
+   :pkcs7_public_key:  /etc/puppet/keys/public_key.pkcs7.pem
+
+:merge_behavior: deeper

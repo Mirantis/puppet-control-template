@@ -1,0 +1,12 @@
+language: ruby
+rvm:
+  - 2.0.0
+
+notifications:
+  email:
+    - [your email]
+
+env:
+  - PUPPET_VERSION=3.8.1
+
+# after_success: "curl -u 'deploy:[your deploy password' -m 120 [your deploy app url]:9292/deploy/environment/$TRAVIS_BRANCH"

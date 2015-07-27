@@ -1,0 +1,114 @@
+---
+# Encrypt anything sensitive in here with hiera-eyaml
+
+##############
+### Puppet ###
+##############
+
+# Autosign stuff
+puppet::autosign::oid: 'your autosign OID here'
+puppet::autosign::key: 'your autosign key here'
+
+# Config for the agent
+puppet::agent::config:
+  version: present
+  server: false
+  server_ca: false
+  runmode: cron
+  pluginsync: true
+  show_diff: false
+  puppetmaster: puppet.yourdomain.tld
+  ca_server: puppetca.yourdomain.tld
+  ca_ttl: "20y"
+  server_parser: 'current'
+
+# Master and CA stuff
+puppet::master::config:
+  version: present
+  server: true
+  server_ca: false
+  runmode: cron
+  pluginsync: true
+  show_diff: false
+  puppetmaster: puppet.yourdomain.tld
+  ca_server: puppetca.yourdomain.tld
+  server_foreman_url: "https://foreman.yourdomain.tld"
+  server_storeconfigs_backend: "puppetdb"
+  server_reports: "foreman, puppetdb"
+  ca_ttl: "20y"
+  autosign_file: "autosign-policy.rb"
+  autosign_mode: '750'
+  server_parser: 'current'
+  r10k_version: '2.0.2'
+  r10k_remote_repo: 'url to your control repo'
+
+dns_alt_names:
+  - "foreman.yourdomain.tld"
+  - "foreman-proxy.yourdomain.tld"
+  - "puppet.yourdomain.tld"
+  - "puppet1.yourdomain.tld"
+  - "puppet2.yourdomain.tld"
+  - "foreman"
+  - "puppet"
+  - "puppet1"
+  - "puppet2"
+  - "foreman-proxy"
+  - "puppetca"
+  - "puppetca.yourdomain.tld"
+
+# PuppetDB
+puppet::db::config:
+  database: "postgres"
+  database_name: "puppetdb"
+  database_username: "puppetdb"
+  database_password: 
+  service_status: "running"
+  ssl_listen_address: "0.0.0.0"
+  ssl_deploy_certs: true
+  puppetdb_server: "puppetdb.yourdomain.tld"
+  listen_address: "0.0.0.0"
+  listen_port: 8080
+  ssl_listen_port: 8081
+
+##################
+### End Puppet ###
+##################
+
+###################
+### Puppet Users ##
+###################
+users:
+  deploy:
+    ensure: present
+    home: /home/deploy
+    shell: /bin/bash
+    # generate pw with `openssl passwd 1`
+    password: '$1$EDLqltWJ$S9FOaTsnZizD4Vh5Uhc9L1'
+    managehome: true
+
+ssh_keys:
+  deploy:
+    ensure: present
+    key: 'ssh public key for deploy user here'
+    type: ssh-rsa
+    user: deploy
+
+groups:
+  wheel:
+    ensure: present
+  reaktor:
+    ensure: absent
+
+sudo::configs:
+  'wheel':
+    'content'  : "%wheel    ALL=(ALL)    ALL"
+    'priority' : 10
+  'deploy':
+    'content' : |
+      Defaults:deploy !requiretty
+      deploy ALL = (root) NOPASSWD: /usr/local/bin/r10k
+    'priority' : 20
+
+########################
+### End Puppet Users ###
+########################

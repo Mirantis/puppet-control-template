@@ -1,0 +1,10 @@
+---
+
+rabbit::config:
+  hosts: "192.168.0.6:5673,192.168.0.5:5673"
+  user: "nova"
+  password: 'rabbit password here'
+  virtualhost: "/"
+  use_ssl: "false"
+  ha_queues: "True"
+

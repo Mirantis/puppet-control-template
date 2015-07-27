@@ -1,0 +1,32 @@
+---
+auth:
+  nova_user: "nova"
+  nova_tenant_name: "services"
+  nova_admin_password: 'nova admin password here'
+  nova_db_pass: 'nova db pass here'
+  neutron_user: "neutron"
+  neutron_tenant_name: "services"
+  neutron_admin_password: 'neutron admin pass here'
+  neutron_db_pass: 'neutron db pass here'
+  neutron_metadata_proxy_shared_secret: 'neutron metadata proxy shared secret here'
+  cinder_user: "cinder"
+  cinder_tenant_name: "services"
+  cinder_admin_password: 'cinder admin password here'
+  cinder_db_pass: 'cinder db password here'
+  glance_user: "glance"
+  glance_tenant_name: "services"
+  glance_admin_password: 'glance admin password here'
+  glance_db_pass: 'glance db password here'
+  glance_rabbit_user: "guest"
+  glance_rabbit_pass: 'glance rabbit pass (if used) here'
+  heat_user: "heat"
+  heat_tenant_name: "services"
+  heat_admin_password: 'heat admin pass here'
+  heat_db_pass: 'heat db pass here'
+  rbd_user: "compute"
+  cinder_rbd_user: "volumes"
+  rbd_secret_uuid: 'rbd secret uuid here'
+  keystone_db_user: 'keystone'
+  keystone_db_pass: 'keystone db pass here'
+  bind_user: 'bind user for LDAP here'
+  ldap_password: 'ldap password for bind user here'

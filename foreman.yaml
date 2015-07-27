@@ -1,0 +1,12 @@
+---
+:url: "https://foreman.yourdomain.tld"
+:ssl_ca: "/var/lib/puppet/ssl/certs/ca.pem"
+:ssl_cert: "/var/lib/puppet/ssl/certs/foreman.yourdomain.tld.pem"
+:ssl_key: "/var/lib/puppet/ssl/private_keys/foreman.yourdomain.tld.pem"
+:user: ""
+:password: ""
+:puppetdir: "/var/lib/puppet"
+:puppetuser: "puppet"
+:facts: true
+:timeout: 10
+:threads: null
