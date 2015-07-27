@@ -7,6 +7,9 @@ require 'pp'
 require 'yaml'
 require 'json'
 
+# Setup application_tier so hiera data can be loaded properly
+ENV['FACTER_application_tier'] = 'openstack'
+
 #######################################
 #### Functions and config. See the ####
 #### bottom for where we actually #####
@@ -17,6 +20,21 @@ def lock
   # Get an exclusive lock on our lockfile to prevent multiple copies of this script from running
   lockfile = File.open('/var/run/pmlc.lock', File::RDWR|File::CREAT, 0644)
   Timeout::timeout(0.001) { lockfile.flock(File::LOCK_EX) } rescue nil
+end
+
+def setup_eyaml(verbose)
+  setup_eyaml      = %Q(dockerctl shell astute mco rpc execute_shell_command execute cmd="puppet resource package hiera-eyaml ensure='present' | tee -a /var/log/pmlc.log")
+  setup_deep_merge = %Q(dockerctl shell astute mco rpc execute_shell_command execute cmd="puppet resource package deep_merge ensure='present' | tee -a /var/log/pmlc.log")
+  if $?.exitstatus != 0
+    wet_the_bed("Could not setup hiera-eyaml and deep_merge. Cannot continue")
+  end
+
+  if verbose == true
+    puts "\ndebug:\n#{setup_eyaml}"
+    puts "\ndebug:\n#{setup_deep_merge}"
+  end
+
+  puts "\nhiera-eyaml and deep_merge gems installed."
 end
 
 def setup_git(verbose)
@@ -52,7 +70,7 @@ def directory_exists?(directory)
   File.directory?(directory)
 end
 
-def setup_repos(verbose)
+def setup_repos(verbose, clone)
   # Configure the various repos we'll be using
 
   # Perform a git pull on each repo
@@ -91,7 +109,7 @@ def setup_repos(verbose)
     end
   end
 
-  if options.clone == true
+  if clone == true
     # Exit here because we just want to clone the repos
     exit 0
   end
@@ -165,25 +183,33 @@ end  # class OptparseRunpuppet
 
 def setup_rsync(verbose)
   # Setup the rsync container to have a module for pmlc and setup the syncing between the local repo and it
-  rsync_conf_template        = '/etc/puppet/2014.2.2-6.1/modules/nailgun/templates/rsyncd.conf.erb'
-  rsync_source_dir       = '/etc/pmlc/'
-  rsync_source_template    = '/etc/pmlc/config_templates/rsyncd.conf.erb'
-  rsync_docker_id        = `docker ps | grep rsync | awk '{print $1}'`
+  rsync_conf_template         = '/etc/puppet/2014.2.2-6.1/modules/nailgun/templates/rsyncd.conf.erb'
+  rsync_source_dir            = '/etc/pmlc/'
+  rsync_keys_dir              = '/etc/pmlc/keys'
+  unless File.exists? "#{rsync_keys_dir}/public_key.pkcs7.pem"
+    wet_the_bed("#{rsync_key_dir}/public_key.pkcs7.pem does not exist.  Please place your pkcs7 keys inside that directory.")
+  end
+  unless File.exists? "#{rsync_keys_dir}/private_key.pkcs7.pem"
+    wet_the_bed("#{rsync_keys_dir}/public_key.pkcs7.pem does not exist. Please place your pkcs7 keys inside that directory.")
+  end
+  rsync_source_template       = '/etc/pmlc/config_templates/rsyncd.conf.erb'
+  rsync_docker_id             = `docker ps | grep rsync | awk '{print $1}'`
   rsync_docker_id.chomp!
-  rsync_container_id     = `docker_id="#{rsync_docker_id}" ; docker inspect $docker_id | grep Id | awk '{print $NF}' | cut -d \\" -f2`
+  rsync_container_id          = `docker_id="#{rsync_docker_id}" ; docker inspect $docker_id | grep Id | awk '{print $NF}' | cut -d \\" -f2`
   rsync_container_id.chomp!
-  rsync_container_root   = "/var/lib/docker/devicemapper/mnt/#{rsync_container_id}/rootfs"
+  rsync_container_root        = "/var/lib/docker/devicemapper/mnt/#{rsync_container_id}/rootfs"
   rsync_container_root.chomp!
-  rsync_container_conf   = "#{rsync_container_root}/etc/rsyncd.conf"
-  rsync_pmlc_dir         = "#{rsync_container_root}/etc/pmlc"
+  rsync_container_conf        = "#{rsync_container_root}/etc/rsyncd.conf"
+  rsync_pmlc_dir              = "#{rsync_container_root}/etc/pmlc"
 
   if verbose == true
-    puts "\ndebug: rsync_source_dir     = #{rsync_source_dir}"
+    puts "\ndebug: rsync_source_dir   = #{rsync_source_dir}"
     puts "debug: rsync_docker_id      = #{rsync_docker_id}"
     puts "debug: rsync_container_id   = #{rsync_container_id}"
     puts "debug: rsync_container_root = #{rsync_container_root}"
     puts "debug: rsync_container_conf = #{rsync_container_conf}"
     puts "debug: rsync pmlc_dir       = #{rsync_pmlc_dir}\n"
+    puts "debug: rsync_keys_dir       = #{rsync_keys_dir}\n"
   end
 
   puts "\nSyncing code to rsync container\n"
@@ -298,12 +324,16 @@ if options.noop
   puts "\nnoop flag present. Puppet will be run in noop mode."
 end
 
+puts "\n#######################\n### Setup eyaml     ###\n#######################"
+setup_eyaml(options.verbose)
+puts "\n#######################\n### End setup eyaml ###\n#######################"
+
 puts "\n#######################\n### Setting up git  ###\n#######################"
 setup_git(options.verbose)
 puts "\n#######################\n### Done with Git   ###\n#######################"
 
 puts "\n########################\n### Setting up repos ###\n########################"
-setup_repos(options.verbose)
+setup_repos(options.verbose, options.clone)
 puts "\n#######################\n### Done with repos ###\n#######################"
 
 puts "\n########################\n### Setting up rsync ###\n########################"
