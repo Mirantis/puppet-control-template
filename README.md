@@ -33,6 +33,11 @@ hieradata/foreman_proxy.yaml
 puppet.conf
 ```
 
+### Configure R10k and your Puppetfile
+Modify the file 'Puppetfile' and ensure all of the modules needed are specified and the correct git repo and version is specified. Note, that with r10k, each branch of this control repo becomes a new Puppet environment.  Thus, hiera data and what versions of which modules are deployed can vary (by design) with a different branch.
+
+Modify configure_r10k.pp and update the remote git repo with the location of your new project containing this control repo.
+
 ### Deploy code to puppetmasters automatically
 If you want to send a post-receive hook or webhook or something (travis CI after_success hook too) to deploy your updated code to puppetmasters without having to manually kick off an r10k deploy on them, you'll need to setup the deploy application (https://github.com/mirantis/puppet-deploy.git).  It's an extremely basic and straightforward sinatra app.  You can install it by applying roles::deploy from https://github.com/mirantis/roles.git to the node you wish to build. You'll need to edit the following file and setup the password, url, puppetmasters, etc:
 ```
@@ -56,3 +61,6 @@ hieradata/openstack/config.yaml
 hieradata/openstack/rabbit.yaml
 ```
 You can now use the roles in https://github.com/mirantis/roles.git for roles::openstack::controller and roles::openstack::compute, etc.
+
+## I'm all done, now how do I use it?
+Go to https://github.com/mirantis/puppet-bootstrap.git and follow the instructions to build yourself a foreman/puppet cluster.
