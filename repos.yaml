@@ -30,3 +30,6 @@ inifile:
 ntp:
   location: /etc/pmlc/modules/ntp
   remote: https://github.com/puppetlabs/puppetlabs-ntp.git
+sudo:
+  location: /etc/pmlc/modules/sudo
+  remote: https://github.com/mirantis/puppet-sudo.git
