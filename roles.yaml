@@ -1,7 +1,7 @@
 ---
 
 roles:
-  controller: "::roles::openstack::controller"
-  compute: "::roles::openstack::compute"
-  mongo: "::roles::openstack::mongo"
-  ceph: "::roles::openstack::ceph_osd"
+  controller: "::roles::openstack::pmlc_controller"
+  compute: "::roles::openstack::pmlc_compute"
+  mongo: "::roles::openstack::pmlc_mongo"
+  ceph: "::roles::openstack::pmlc_ceph_osd"
