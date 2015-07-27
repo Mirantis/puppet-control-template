@@ -23,10 +23,15 @@ def lock
 end
 
 def setup_eyaml(verbose)
-  setup_eyaml      = %Q(dockerctl shell astute mco rpc execute_shell_command execute cmd="puppet resource package hiera-eyaml ensure='present' | tee -a /var/log/pmlc.log")
-  setup_deep_merge = %Q(dockerctl shell astute mco rpc execute_shell_command execute cmd="puppet resource package deep_merge ensure='present' | tee -a /var/log/pmlc.log")
+  setup_eyaml_cmd      = %Q(dockerctl shell astute mco rpc execute_shell_command execute cmd="gem install hiera-eyaml | tee -a /var/log/pmlc.log")
+  setup_deep_merge_cmd = %Q(dockerctl shell astute mco rpc execute_shell_command execute cmd="gem install deep_merge | tee -a /var/log/pmlc.log")
+  setup_eyaml = system("#{setup_eyaml_cmd}")
   if $?.exitstatus != 0
-    wet_the_bed("Could not setup hiera-eyaml and deep_merge. Cannot continue")
+    wet_the_bed("\nNot able to install hiera-eyaml gem")
+  end
+  setup_deep_merge = system("#{setup_deep_merge_cmd}")
+  if $?.exitstatus != 0
+    wet_the_bed("\nNot able to install deep_merge gem")
   end
 
   if verbose == true
@@ -187,7 +192,7 @@ def setup_rsync(verbose)
   rsync_source_dir            = '/etc/pmlc/'
   rsync_keys_dir              = '/etc/pmlc/keys'
   unless File.exists? "#{rsync_keys_dir}/public_key.pkcs7.pem"
-    wet_the_bed("#{rsync_key_dir}/public_key.pkcs7.pem does not exist.  Please place your pkcs7 keys inside that directory.")
+    wet_the_bed("#{rsync_keys_dir}/public_key.pkcs7.pem does not exist.  Please place your pkcs7 keys inside that directory.")
   end
   unless File.exists? "#{rsync_keys_dir}/private_key.pkcs7.pem"
     wet_the_bed("#{rsync_keys_dir}/public_key.pkcs7.pem does not exist. Please place your pkcs7 keys inside that directory.")
