@@ -1,0 +1,32 @@
+---
+
+pmlc:
+  location: /etc/pmlc
+  remote: https://github.com/mirantis/puppet-control-template.git
+pmlc_nova:
+  location: /etc/pmlc/modules/pmlc_nova
+  remote: https://github.com/mirantis/pmlc_nova.git
+pmlc_cinder:
+  location: /etc/pmlc/modules/pmlc_cinder
+  remote: https://github.com/mirantis/pmlc_cinder.git
+roles:
+  location: /etc/pmlc/modules/roles
+  remote: https://github.com/mirantis/roles.git
+profiles:
+  location: /etc/pmlc/modules/profiles
+  remote: https://github.com/mirantis/profiles.git
+pmlc_neutron:
+  location: /etc/pmlc/modules/pmlc_neutron
+  remote: https://github.com/mirantis/pmlc_neutron.git
+pmlc_keystone:
+  location: /etc/pmlc/modules/pmlc_keystone
+  remote: https://github.com/mirantis/pmlc_keystone.git
+stdlib:
+  location: /etc/pmlc/modules/stdlib
+  remote: https://github.com/puppetlabs/puppetlabs-stdlib.git
+inifile:
+  location: /etc/pmlc/modules/inifile
+  remote: https://github.com/puppetlabs/puppetlabs-inifile.git
+ntp:
+  location: /etc/pmlc/modules/ntp
+  remote: https://github.com/puppetlabs/puppetlabs-ntp.git

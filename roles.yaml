@@ -1,0 +1,7 @@
+---
+
+roles:
+  controller: "::roles::openstack::controller"
+  compute: "::roles::openstack::compute"
+  mongo: "::roles::openstack::mongo"
+  ceph: "::roles::openstack::ceph_osd"
