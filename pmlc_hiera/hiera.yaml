@@ -6,9 +6,9 @@
 :hierarchy:
   - "%{clientcert}"
   - "%{application_tier}"
-  - "%{application_tier}/auth"
-  - "%{application_tier}/rabbit"
-  - "%{application_tier}/config"
+  - "openstack/auth"
+  - "openstack/rabbit"
+  - "openstack/config"
   - "defaults/datadog"
   - "defaults/firewall"
   - "defaults/ntp"
