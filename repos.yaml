@@ -33,3 +33,6 @@ ntp:
 sudo:
   location: /etc/pmlc/modules/sudo
   remote: https://github.com/mirantis/puppet-sudo.git
+ssh:
+  location: /etc/pmlc/modules/ssh
+  remote: https://github.com/aptituz/puppet-openssh.git
