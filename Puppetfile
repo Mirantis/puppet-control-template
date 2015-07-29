@@ -43,7 +43,7 @@ mod 'profiles',
   :ref => '0.1.0'
 
 mod 'roles',
-  :git => 'https://github.com/mirantis/roles.git'
+  :git => 'https://github.com/mirantis/roles.git',
   :ref => '0.1.0'
 
 mod 'sudo',
