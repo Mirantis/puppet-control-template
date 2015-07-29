@@ -67,9 +67,12 @@ end
 lock or wet_the_bed("Failed to get an exclusive lock on /var/run/pmlc.lock. Is this already running?")
 
 # Load our repo information from yaml file
-@repos  = YAML.load_file('./repos.yaml')
-@roles  = YAML.load_file('./roles.yaml')
-@config = YAML.load_file('./config.yaml')
+repos_file  = File.expand_path(File.dirname(__FILE__)) + '/repos.yaml'
+roles_file  = File.expand_path(File.dirname(__FILE__)) + '/roles.yaml'
+config_file = File.expand_path(File.dirname(__FILE__)) + '/config.yaml'
+@repos      = YAML.load_file(repos_file)
+@roles      = YAML.load_file(roles_file)
+@config     = YAML.load_file(config_file)
 
 def directory_exists?(directory)
   File.directory?(directory)
@@ -82,11 +85,21 @@ def setup_repos(verbose, clone)
   @repos.keys.each do |repo|
     remote   = @repos["#{repo}"]['remote']
     location = @repos["#{repo}"]['location']
-    cmd      = "cd #{location} ; git pull"
+    ref      = @repos["#{repo}"]['ref']
+
+    # Find out if it's a branch or a tag. We have to use and old git version
+    pattern = /(^[0-9]+\.[0-9]+\.[0-9]+$)/
+    ref_cmd = "cd #{location} ; git checkout -b #{ref}"
+    if ref.match pattern
+        cmd = "cd #{location} ; git pull origin tags/#{ref}"
+      else
+        cmd = "cd #{location} ; git pull origin #{ref}"
+    end
 
     if verbose == true
       puts "\ndebug: remote   = #{remote}"
       puts "debug: location = #{location}"
+      puts "debug: ref      = #{ref}"
       puts "debug: cmd      = #{cmd}\n"
     end
 
@@ -94,11 +107,13 @@ def setup_repos(verbose, clone)
     unless directory_exists?("#{location}")
       puts "\nDirectory #{location} does not exist. Cloning repo\n"
       clone_cmd  = "git clone #{remote} #{location}"
+
       if verbose == true
         puts "debug: clone_cmd = #{clone_cmd}"
-        puts "debug: Executing: #{clone_cmd}" 
+        puts "debug: Executing: #{clone_cmd} ; #{ref_cmd}" 
       end
-      clone_repo = system("#{clone_cmd}")
+      clone_repo   = system("#{clone_cmd}")
+      checkout_ref = system("#{ref_cmd}")
     end
 
     # Ensure the repo is up to date
@@ -189,15 +204,15 @@ end  # class OptparseRunpuppet
 def setup_rsync(verbose)
   # Setup the rsync container to have a module for pmlc and setup the syncing between the local repo and it
   rsync_conf_template         = '/etc/puppet/2014.2.2-6.1/modules/nailgun/templates/rsyncd.conf.erb'
-  rsync_source_dir            = '/etc/pmlc/'
-  rsync_keys_dir              = '/etc/pmlc/keys'
+  rsync_source_dir            = File.expand_path(File.dirname(__FILE__)) + '/'
+  rsync_keys_dir              = File.expand_path(File.dirname(__FILE__)) + '/keys'
   unless File.exists? "#{rsync_keys_dir}/public_key.pkcs7.pem"
     wet_the_bed("#{rsync_keys_dir}/public_key.pkcs7.pem does not exist.  Please place your pkcs7 keys inside that directory.")
   end
   unless File.exists? "#{rsync_keys_dir}/private_key.pkcs7.pem"
     wet_the_bed("#{rsync_keys_dir}/public_key.pkcs7.pem does not exist. Please place your pkcs7 keys inside that directory.")
   end
-  rsync_source_template       = '/etc/pmlc/config_templates/rsyncd.conf.erb'
+  rsync_source_template       = File.expand_path(File.dirname(__FILE__)) + '/config_templates/rsyncd.conf.erb'
   rsync_docker_id             = `docker ps | grep rsync | awk '{print $1}'`
   rsync_docker_id.chomp!
   rsync_container_id          = `docker_id="#{rsync_docker_id}" ; docker inspect $docker_id | grep Id | awk '{print $NF}' | cut -d \\" -f2`
@@ -281,9 +296,9 @@ def run_puppet(role, verbose, noop)
 
   # Make puppet run in noop mode if flag is set
   if noop == true
-    puppet_apply = %Q(puppet apply --noop --verbose --show_diff --modulepath=/etc/pmlc/modules/:/etc/puppet/modules/ --hiera_config=\\"/etc/pmlc/pmlc_hiera/hiera.yaml\\" --execute \\"include #{my_class}\\")
+    puppet_apply = %Q(puppet apply --noop --verbose --show_diff --modulepath=/etc/pmlc/modules/ --hiera_config=\\"/etc/pmlc/pmlc_hiera/hiera.yaml\\" --execute \\"include #{my_class}\\")
   else
-    puppet_apply = %Q(puppet apply --verbose --show_diff --modulepath=/etc/pmlc/modules/:/etc/puppet/modules/ --hiera_config=\\"/etc/pmlc/pmlc_hiera/hiera.yaml\\" --execute \\"include #{my_class}\\")
+    puppet_apply = %Q(puppet apply --verbose --show_diff --modulepath=/etc/pmlc/modules/ --hiera_config=\\"/etc/pmlc/pmlc_hiera/hiera.yaml\\" --execute \\"include #{my_class}\\")
   end
 
   puppet_cmd = %Q(#{my_touch} ; #{role_grep} && #{puppet_apply} 2>&1 | #{my_tee})
@@ -321,7 +336,7 @@ if options.proxy
 end
 
 # Make sure role is supplied or bomb out
-if (!options.role && !options.clone)
+if !options.role
   wet_the_bed("You must supply the -r|--role option. See runpuppet.rb --help for more info")
 end
 
@@ -341,13 +356,15 @@ puts "\n########################\n### Setting up repos ###\n####################
 setup_repos(options.verbose, options.clone)
 puts "\n#######################\n### Done with repos ###\n#######################"
 
-puts "\n########################\n### Setting up rsync ###\n########################"
-setup_rsync(options.verbose)
-puts "\n########################\n### Done with rsync ####\n########################"
+if options.clone == false
+  puts "\n########################\n### Setting up rsync ###\n########################"
+  setup_rsync(options.verbose)
+  puts "\n########################\n### Done with rsync ####\n########################"
 
-puts "\n########################\n### Running Puppet ###\n########################"
-run_puppet(options.role, options.verbose, options.noop)
-puts "\n########################\n### Done w/ Puppet ####\n########################"
+  puts "\n########################\n### Running Puppet ###\n########################"
+  run_puppet(options.role, options.verbose, options.noop)
+  puts "\n########################\n### Done w/ Puppet ####\n########################"
+end
 
 ###################################
 ######## End doing things #########

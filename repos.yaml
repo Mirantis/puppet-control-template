@@ -3,36 +3,48 @@
 pmlc:
   location: /etc/pmlc
   remote: https://github.com/mirantis/puppet-control-template.git
+  ref: master
 pmlc_nova:
   location: /etc/pmlc/modules/pmlc_nova
   remote: https://github.com/mirantis/pmlc_nova.git
+  ref: 0.1.0
 pmlc_cinder:
   location: /etc/pmlc/modules/pmlc_cinder
   remote: https://github.com/mirantis/pmlc_cinder.git
+  ref: 0.1.0
 roles:
   location: /etc/pmlc/modules/roles
   remote: https://github.com/mirantis/roles.git
+  ref: 0.1.0
 profiles:
   location: /etc/pmlc/modules/profiles
   remote: https://github.com/mirantis/profiles.git
+  ref: 0.1.0
 pmlc_neutron:
   location: /etc/pmlc/modules/pmlc_neutron
   remote: https://github.com/mirantis/pmlc_neutron.git
+  ref: 0.1.0
 pmlc_keystone:
   location: /etc/pmlc/modules/pmlc_keystone
   remote: https://github.com/mirantis/pmlc_keystone.git
+  ref: 0.1.0
 stdlib:
   location: /etc/pmlc/modules/stdlib
   remote: https://github.com/puppetlabs/puppetlabs-stdlib.git
+  ref: 4.7.0
 inifile:
   location: /etc/pmlc/modules/inifile
   remote: https://github.com/puppetlabs/puppetlabs-inifile.git
+  ref: 1.4.0
 ntp:
   location: /etc/pmlc/modules/ntp
   remote: https://github.com/puppetlabs/puppetlabs-ntp.git
+  ref: 4.1.0
 sudo:
   location: /etc/pmlc/modules/sudo
   remote: https://github.com/mirantis/puppet-sudo.git
+  ref: 3.0.10
 ssh:
   location: /etc/pmlc/modules/ssh
   remote: https://github.com/aptituz/puppet-openssh.git
+  ref: master
