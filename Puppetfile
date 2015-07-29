@@ -60,7 +60,7 @@ mod 'foreman_proxy',
 
 mod 'deploy',
   :git => 'https://github.com/mirantis/puppet-deploy.git',
-  :ref => '0.1.0'
+  :ref => '0.1.3'
 
 mod 'pmlc_nova',
   :git => 'https://github.com/mirantis/pmlc_nova.git',
