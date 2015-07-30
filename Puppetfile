@@ -56,7 +56,7 @@ mod 'puppet',
 
 mod 'foreman_proxy',
   :git => 'https://github.com/mirantis/puppet-foreman_proxy.git',
-  :ref => '0.1.0'
+  :ref => '2.2.3'
 
 mod 'deploy',
   :git => 'https://github.com/mirantis/puppet-deployapp.git',
